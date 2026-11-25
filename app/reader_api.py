@@ -76,7 +76,7 @@ async def lanraragi_info():
         "version_name": "Comics AI",
         "has_password": "0",
         "nofun_mode": "0",
-        "archives_per_page": 100,
+        "archives_per_page": 1000,
     }
 
 
@@ -109,7 +109,7 @@ async def lanraragi_search(
     if sortby == "title":
         entries.sort(key=lambda e: e["title"].lower(), reverse=reverse)
     filtered = len(entries)
-    page_items = entries[start:start + 100]
+    page_items = entries[start:]
     return {
         "data": page_items,
         "draw": 0,

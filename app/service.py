@@ -178,7 +178,7 @@ async def _run_job(job_id: str, request: GenerateRequest, plan, project_id: str)
                     char_visuals = ", ".join(
                         re.sub(r"[\u0590-\u05ff]+", "", a.prompt).split(",")[0].strip()
                         for a in plan.assets if a.kind == "character"
-                    )[:140]
+                    )
                     prompt = (
                         f"{clean_action}, {char_visuals}, "
                         f"{_safe_visual_style(request.style)}, {_color_direction(request.color_mode)}, "
@@ -387,7 +387,7 @@ async def regenerate_single_panel(req: RegeneratePanelRequest) -> dict:
     char_visuals = ", ".join(
         re.sub(r"[\u0590-\u05ff]+", "", a.get("prompt", "")).split(",")[0].strip()
         for a in plan.get("assets", []) if a.get("kind") == "character"
-    )[:140]
+    )
     
     req_data = project.get("request", {})
     color_mode = req_data.get("color_mode", "color")

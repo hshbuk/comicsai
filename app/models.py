@@ -4,10 +4,10 @@ from pydantic import BaseModel, Field
 
 
 class PlanRequest(BaseModel):
-    brief: str = Field(min_length=1, max_length=12000)
+    brief: str = Field(min_length=1)
     pages: int = Field(default=1, ge=1)
-    panels_per_page: int = Field(default=4, ge=1, le=16)
-    style: str = Field(default="comic book illustration", max_length=500)
+    panels_per_page: int = Field(default=4, ge=1)
+    style: str = Field(default="comic book illustration")
     color_mode: str = Field(default="color", pattern="^(color|bw)$")
     language: str = Field(default="he", pattern="^(he|en)$")
 
@@ -23,7 +23,7 @@ class Panel(BaseModel):
     speaker: str = ""
     shot_type: str = "full_body_action"
     critical: bool = False
-    scene_views: list[str] = Field(default_factory=list, max_length=3)
+    scene_views: list[str] = Field(default_factory=list)
     seed: int | None = None
 
 

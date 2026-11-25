@@ -1,10 +1,13 @@
 from app.comfyui_client import _comic_story, prepare_workflow
-from app.models import PlanRequest
+from app.models import Panel, PlanRequest
 
 
-def test_plan_request_allows_over_100_chapters():
-    req = PlanRequest(brief="epic story", pages=150)
+def test_plan_request_allows_large_values():
+    req = PlanRequest(brief="x" * 15000, pages=150, panels_per_page=24, style="s" * 600)
     assert req.pages == 150
+    assert req.panels_per_page == 24
+    panel = Panel(number=1, description="d", prompt="p", scene_views=["v1", "v2", "v3", "v4"])
+    assert len(panel.scene_views) == 4
 
 
 def test_workflow_placeholders_are_replaced_recursively():
