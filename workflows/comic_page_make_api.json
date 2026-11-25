@@ -1,0 +1,57 @@
+{
+  "1": {
+    "inputs": {
+      "story": "",
+      "add_to_positive": "",
+      "add_to_negative": "",
+      "width": 1800,
+      "squares_per_row": 2.6,
+      "bg_color": "#fff7ee",
+      "caption_positioning": "auto",
+      "shear": 0,
+      "seed": 0,
+      "steps": 15,
+      "cfg": 8,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "model": [
+        "2",
+        0
+      ],
+      "clip": [
+        "2",
+        1
+      ],
+      "vae": [
+        "2",
+        2
+      ]
+    },
+    "class_type": "Generate Comic",
+    "_meta": {
+      "title": "Generate Comic"
+    }
+  },
+  "2": {
+    "inputs": {
+      "ckpt_name": "sd_xl_base_1.0.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "3": {
+    "inputs": {
+      "filename_prefix": "comics_ai/page",
+      "images": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Comic Page"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+from app.comfyui_client import _comic_story, prepare_workflow
+
+
+def test_workflow_placeholders_are_replaced_recursively():
+    workflow = {"node": {"inputs": {"text": "__PROMPT__", "seed": "__SEED__", "nested": ["__NEGATIVE_PROMPT__"]}}}
+    result = prepare_workflow(workflow, "hero", "bad", 42)
+    assert result["node"]["inputs"] == {"text": "hero", "seed": 42, "nested": ["bad"]}
+
+
+def test_custom_comic_node_receives_story_and_seed():
+    workflow = {"1": {"class_type": "Generate Comic", "inputs": {"story": "", "add_to_positive": "", "add_to_negative": "", "seed": 0}}}
+    result = prepare_workflow(workflow, "story", "negative", 7)
+    assert result["1"]["inputs"] == {"story": "{vertical, story}", "add_to_positive": "story", "add_to_negative": "negative", "seed": 7}
+
+
+def test_comic_story_uses_required_panel_syntax():
+    assert _comic_story("hero in a castle").startswith("{vertical, hero in a castle}")

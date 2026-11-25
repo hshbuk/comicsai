@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comics AI Studio</title>
+<style>
+:root{--asset-gap:10px;--bg:#0f172a;--card:#1e293b;--line:#475569;--accent:#7c3aed;--success:#22c55e;--danger:#ef4444}
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:#f8fafc;max-width:1380px;margin:auto;padding:22px}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px}
+nav{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}.tab{display:none}.tab.active{display:block}
+.layout{display:grid;grid-template-columns:360px 1fr;gap:20px}
+section{background:var(--card);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.2)}
+label{display:block;margin-top:10px;color:#cbd5e1;font-size:0.92rem;font-weight:600}
+textarea,input,select{width:100%;margin:6px 0 12px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:#fff;font-size:0.95rem}
+button{padding:10px 16px;border:0;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-weight:700;transition:opacity .15s}
+button:hover{opacity:.9}button.secondary{background:#475569}button.success{background:var(--success)}button:disabled{opacity:.5;cursor:not-allowed}
+.status{min-height:26px;color:#c4b5fd;font-size:0.9rem;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.page{border:1px solid var(--line);border-radius:10px;padding:14px;background:#151f32}
+.panel{background:var(--bg);padding:12px;margin-top:8px;border-radius:8px;border-right:3px solid var(--accent)}
+.webtoon{max-width:780px;margin:auto;background:#111827;padding:16px;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.5)}
+.webtoon-page{margin:0 0 32px}
+.webtoon-page h3{position:sticky;top:0;background:#111827;padding:10px;z-index:2;border-bottom:2px solid var(--accent);margin:0 0 12px}
+.webtoon figure{margin:0 0 20px;position:relative;background:#1e293b;border-radius:8px;overflow:hidden;padding-bottom:10px}
+.webtoon img{display:block;width:100%;height:auto;border-radius:6px 6px 0 0}
+.webtoon figcaption{color:#cbd5e1;padding:8px 12px;font-size:0.9rem;display:flex;justify-content:space-between;align-items:center}
+.panel-actions{display:flex;gap:6px}
+.panel-actions button{padding:5px 10px;font-size:0.8rem}
+.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.asset-grid figure{margin:0;background:var(--bg);border-radius:8px;padding:6px;border:1px solid var(--line);text-align:center;position:relative}
+.asset-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px}
+.asset-grid figcaption{font-size:0.75rem;color:#cbd5e1;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asset-badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);padding:2px 6px;border-radius:4px;font-size:0.7rem}
+.badge-import{cursor:pointer;background:var(--accent);color:#fff;border:0;border-radius:4px;padding:4px 8px;font-size:0.75rem;margin-top:4px;width:100%}
+pre{white-space:pre-wrap;overflow:auto;background:var(--bg);padding:14px;border-radius:8px;font-family:monospace;direction:ltr;text-align:left}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+</style></head><body>
+<header>
+  <div>
+    <h1>Comics AI Studio</h1>
+    <small>תכנון, שמירת נכסי רציפות רב-קומיקסיים, יצירה ב-MiniMax / H3 ופורמט Webtoon</small>
+  </div>
+  <div style="display:flex;gap:8px;align-items:flex-end">
+    <div>
+      <label for="projects" style="margin-top:0">פרויקט שמור</label>
+      <select id="projects" style="margin-bottom:0"><option>בחר פרויקט...</option></select>
+    </div>
+    <button id="loadProject" class="secondary">טען</button>
+    <button id="saveProject" class="secondary">שמור</button>
+  </div>
+</header>
+
+<nav>
+  <button data-tab="planning">1. תכנון מקדים</button>
+  <button data-tab="generation">2. יצירה מדורגת</button>
+  <button data-tab="assetBank">3. בנק נכסים גלובלי 🎭</button>
+  <button data-tab="export">4. ייצוא</button>
+</nav>
+
+<!-- Tab 1: Planning -->
+<div id="planning" class="tab active"><div class="layout">
+  <section>
+    <h2>תכנון צ׳פטר</h2>
+    <label>רעיון / תסריט</label>
+    <textarea id="brief" rows="9" placeholder="תאר את העלילה, הדמויות והעולם..."></textarea>
+    <label>שפת הקומיקס</label>
+    <select id="language"><option value="he">עברית</option><option value="en">English</option></select>
+    <label>מספר צ׳פטרים</label>
+    <input id="pages" type="number" min="1" max="100" value="2">
+    <label>דפים / פאנלים בצ׳פטר</label>
+    <input id="panels" type="number" min="1" max="16" value="4">
+    <label>סגנון ציור</label>
+    <select id="style">
+      <option value="japanese_manga">קומיקס יפני / מנגה</option>
+      <option value="american_comics">קומיקס אמריקאי</option>
+      <option value="realistic_comic">קומיקס ריאליסטי</option>
+    </select>
+    <label>צבע</label>
+    <select id="colorMode"><option value="color">צבעוני</option><option value="bw">שחור־לבן</option></select>
+    <button id="planBtn" style="width:100%;margin-top:10px">צור תכנון צ׳פטרים ונכסי רציפות</button>
+    <div id="planStatus" class="status"></div>
+  </section>
+  <section>
+    <h2>תכנון צ׳פטרים ודפים</h2>
+    <div id="planPreview"><small>התכנון יופיע כאן לפני תחילת היצירה.</small></div>
+  </section>
+</div></div>
+
+<!-- Tab 2: Generation -->
+<div id="generation" class="tab"><div class="layout">
+  <section>
+    <h2>יצירה מדורגת</h2>
+    <label>Workflow מנוע יצירה</label>
+    <select id="workflow"></select>
+    <div style="display:flex;gap:6px">
+      <button id="validate" class="secondary" style="flex:1">בדוק workflow</button>
+    </div>
+    <div id="workflowStatus" class="status"></div>
+
+    <label>Seed (אופציונלי)</label>
+    <input id="seed" type="number" placeholder="אוטומטי">
+    <button id="generate" style="width:100%">התחל יצירה מלאה</button>
+    <div id="generateStatus" class="status"></div>
+    <progress id="progress" value="0" max="1" style="width:100%;margin:10px 0"></progress>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+      <h3 style="margin:0">נכסי רציפות בפרויקט</h3>
+      <button class="secondary" style="padding:4px 8px;font-size:0.8rem" onclick="document.querySelector('[data-tab=assetBank]').click()">+ הוסף מבנק נכסים</button>
+    </div>
+    <div id="assetsGallery" class="asset-grid" style="margin-top:10px"></div>
+  </section>
+  <section>
+    <h2>Webtoon — תצוגה חיה עם שליטה פר-פאנל</h2>
+    <div id="gallery" class="webtoon"><small style="padding:20px;display:block;text-align:center">הפאנלים יופיעו כאן בזמן אמת...</small></div>
+  </section>
+</div></div>
+
+<!-- Tab 3: Global Asset Bank -->
+<div id="assetBank" class="tab">
+  <section>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <h2 style="margin:0">בנק נכסים גלובלי (Asset Registry) 🎭</h2>
+        <small style="color:#94a3b8">כל הדמויות, המקומות והחפצים שנשמרו — ניתנים לשימוש חוזר בכל קומיקס קיים או חדש לשמירה על רציפות מלאה!</small>
+      </div>
+      <button id="refreshAssets" class="secondary">רענן ספרייה</button>
+    </div>
+    <div id="globalAssetsGallery" class="asset-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px">
+      <small>טוען נכסים מהמערכת...</small>
+    </div>
+  </section>
+</div>
+
+<!-- Tab 4: Export -->
+<div id="export" class="tab"><section>
+  <h2>ייצוא קומיקס</h2>
+  <div id="exportButtons"><small>צור או טען פרויקט כדי להוריד.</small></div>
+  <h3 style="margin-top:20px">תכנון JSON (LTR קריא)</h3>
+  <pre id="jsonPreview" dir="ltr">אין נתונים</pre>
+</section></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let currentPlan=null,currentProject=null,pollTimer=null,shownImages=0;
+
+// Tabs switcher
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  $(b.dataset.tab).classList.add('active');
+  if(b.dataset.tab==='assetBank') loadGlobalAssets();
+});
+
+async function loadWorkflows(){
+  const r=await fetch('/api/workflows');
+  const d=await r.json();
+  $('workflow').innerHTML=d.workflows.map(x=>`<option value="${x}">${x}</option>`).join('');
+  if(d.workflows.includes('h3_single_panel_api.json')){
+    $('workflow').value='h3_single_panel_api.json';
+  } else if(d.workflows.includes('single_panel_sdxl_ipadapter_api.json')){
+    $('workflow').value='single_panel_sdxl_ipadapter_api.json';
+  }
+}
+
+async function loadProjects(){
+  const r=await fetch('/api/projects');
+  const d=await r.json();
+  $('projects').innerHTML='<option value="">בחר פרויקט...</option>'+d.projects.map(p=>`<option value="${p.project_id}">${p.title} — ${p.images} תמונות — ${p.status}</option>`).join('');
+}
+
+async function loadGlobalAssets(){
+  try{
+    const r=await fetch('/api/assets');
+    const d=await r.json();
+    const container=$('globalAssetsGallery');
+    if(!d.assets||!d.assets.length){
+      container.innerHTML='<small>טרם נוצרו נכסים בספרייה הגלובלית. צור קומיקס ראשון או ייצר נכס כדי שיופיע כאן!</small>';
+      return;
+    }
+    container.innerHTML=d.assets.map(a=>`
+      <figure style="padding:10px;background:#151f32">
+        <span class="asset-badge">${a.kind==='character'?'דמות 👤':'מיקום 🏰'}</span>
+        <img src="${a.image}?v=${Date.now()}" alt="${a.name}">
+        <figcaption style="font-weight:700;font-size:0.95rem;margin-top:8px">${a.name}</figcaption>
+        <div style="font-size:0.75rem;color:#94a3b8;margin:4px 0">${a.description||''}</div>
+        <button class="badge-import" onclick="importAssetToCurrent('${a.id}')">השתמש בקומיקס זה ➕</button>
+      </figure>
+    `).join('');
+  }catch(e){
+    $('globalAssetsGallery').innerHTML='<small style="color:red">שגיאה בטעינת נכסים</small>';
+  }
+}
+
+async function importAssetToCurrent(assetId){
+  if(!currentProject){
+    alert('יש לטעון או ליצור פרויקט לפני ייבוא נכס.');
+    return;
+  }
+  try{
+    const r=await fetch('/api/assets/import',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({project_id:currentProject,asset_id:assetId})
+    });
+    if(!r.ok) throw Error((await r.json()).detail);
+    const proj=await r.json();
+    currentPlan=proj.plan;
+    renderAssets(currentPlan.assets||[]);
+    alert('הנכס יובא בהצלחה לפרויקט זה וישמש כרפרנס רציפות!');
+    document.querySelector('[data-tab=generation]').click();
+  }catch(e){
+    alert('שגיאה בייבוא נכס: '+e.message);
+  }
+}
+
+function renderPlan(plan){
+  currentPlan=plan;
+  $('jsonPreview').textContent=JSON.stringify(plan,null,2);
+  $('planPreview').innerHTML=`
+    <h3>${plan.title}</h3>
+    <p>צ׳פטרים: ${plan.pages.length} | סה"כ דפים: ${plan.pages.reduce((n,p)=>n+p.panels.length,0)} | נכסי רציפות שתוכננו: ${(plan.assets||[]).length}</p>
+    <div class="grid">${plan.pages.map(p=>`
+      <div class="page">
+        <h3>צ׳פטר ${p.number}: ${p.title}</h3>
+        <p style="color:#94a3b8">${p.summary}</p>
+        ${p.panels.map(f=>`
+          <div class="panel">
+            <b>פאנל ${f.number}</b><br>
+            <small>תיאור: ${f.description}<br>
+            קריינות: ${f.narration||'ללא'}<br>
+            דיאלוג: ${f.dialogue?.join(' | ')||'ללא'}</small>
+          </div>
+        `).join('')}
+      </div>
+    `).join('')}</div>
+  `;
+}
+
+function renderWebtoon(images){
+  if(!images||!images.length){
+    $('gallery').innerHTML='<small style="padding:20px;display:block;text-align:center">אין תמונות עדיין...</small>';
+    return;
+  }
+  $('gallery').innerHTML=images.map((url,i)=>{
+    const m=url.match(/page-(\d+)-panel-(\d+)(?:-view-(\d+))?/);
+    const page=m?Number(m[1]):1;
+    const panel=m?Number(m[2]):i+1;
+    const view=m&&m[3]?Number(m[3]):1;
+    return `
+      <div class="webtoon-page" data-page="${page}">
+        ${panel===1&&view===1?`<h3>צ׳פטר ${page}</h3>`:''}
+        <figure id="panel-fig-${page}-${panel}-${view}">
+          <img loading="lazy" src="${url}?v=${Date.now()}" alt="צ׳פטר ${page}, דף ${panel}">
+          <figcaption>
+            <span>צ׳פטר ${page}, דף ${panel}${view>1?` (תקריב ${view})`:''}</span>
+            <div class="panel-actions">
+              <button class="secondary" onclick="regeneratePanel(${page},${panel},${view})">🔄 צור מחדש פאנל זה</button>
+            </div>
+          </figcaption>
+        </figure>
+      </div>
+    `;
+  }).join('');
+}
+
+async function regeneratePanel(page,panel,view){
+  if(!currentProject) return;
+  const fig=$(`panel-fig-${page}-${panel}-${view}`);
+  if(fig) fig.style.opacity='0.4';
+  try{
+    const r=await fetch('/api/generate/panel',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        project_id:currentProject,
+        page_number:page,
+        panel_number:panel,
+        view_index:view,
+        workflow:$('workflow').value
+      })
+    });
+    if(!r.ok) throw Error((await r.json()).detail);
+    const res=await r.json();
+    if(fig){
+      const img=fig.querySelector('img');
+      img.src=res.image;
+      fig.style.opacity='1';
+    }
+  }catch(e){
+    alert('שגיאה ביצירת פאנל מחדש: '+e.message);
+    if(fig) fig.style.opacity='1';
+  }
+}
+
+function renderAssets(assets=[]){
+  $('assetsGallery').innerHTML=assets.map(a=>a.image?`
+    <figure>
+      <span class="asset-badge">${a.kind==='character'?'👤':'🏰'}</span>
+      <img src="${a.image}?v=${Date.now()}" alt="${a.name}">
+      <figcaption>${a.name}</figcaption>
+    </figure>
+  `:`
+    <div style="background:#151f32;padding:8px;border-radius:6px">
+      <b>${a.kind}: ${a.name}</b><br>
+      <small style="color:#94a3b8">${a.description}</small>
+    </div>
+  `).join('');
+}
+
+function setExports(){
+  if(!currentProject) return;
+  $('exportButtons').innerHTML=`
+    <button onclick="location.href='/api/projects/${currentProject}/export?format=cbz'">ייצוא CBZ לקומיקס</button>
+    <button class="secondary" onclick="location.href='/api/projects/${currentProject}/export?format=zip'">ZIP מלא</button>
+    <button class="secondary" onclick="location.href='/api/projects/${currentProject}/export?format=json'">JSON</button>
+    <button class="secondary" onclick="location.href='/api/projects/${currentProject}/export?format=markdown'">תסריט Markdown</button>
+  `;
+}
+
+$('planBtn').onclick=async()=>{
+  if(!$('brief').value.trim()) return $('planStatus').textContent='יש להזין רעיון או תסריט';
+  $('planBtn').disabled=true;
+  $('planStatus').textContent='בונה צ׳פטרים, מפרק לפאנלים ויוצר נכסי רציפות...';
+  try{
+    const r=await fetch('/api/plan',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        brief:$('brief').value,
+        pages:+$('pages').value,
+        panels_per_page:+$('panels').value,
+        style:$('style').value,
+        color_mode:$('colorMode').value,
+        language:$('language').value
+      })
+    });
+    if(!r.ok) throw Error((await r.json()).detail||'שגיאה בתכנון');
+    renderPlan(await r.json());
+    $('planStatus').textContent='התכנון מוכן!';
+    document.querySelector('[data-tab="generation"]').click();
+  }catch(e){
+    $('planStatus').textContent=e.message;
+  }finally{
+    $('planBtn').disabled=false;
+  }
+};
+
+$('validate').onclick=async()=>{
+  const r=await fetch('/api/workflows/'+encodeURIComponent($('workflow').value)+'/validate');
+  const d=await r.json();
+  $('workflowStatus').textContent=d.valid?`תקין — ${d.nodes} nodes`:'בעיה: '+d.errors.join(', ');
+};
+
+$('generate').onclick=async()=>{
+  if(!currentPlan) return $('generateStatus').textContent='צור תכנון קודם בלשונית 1';
+  $('generate').disabled=true;
+  $('generateStatus').textContent='מתחיל יצירה מדורגת...';
+  try{
+    const body={
+      brief:$('brief').value,
+      pages:+$('pages').value,
+      panels_per_page:+$('panels').value,
+      style:$('style').value,
+      color_mode:$('colorMode').value,
+      language:$('language').value,
+      workflow:$('workflow').value,
+      plan:currentPlan
+    };
+    if($('seed').value) body.seed=+$('seed').value;
+    const r=await fetch('/api/generate/start',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    const job=await r.json();
+    if(!r.ok) throw Error(job.detail);
+    currentProject=job.project_id;
+    shownImages=0;
+    $('progress').max=job.total;
+    pollTimer=setInterval(async()=>{
+      const s=await (await fetch('/api/jobs/'+job.job_id)).json();
+      $('progress').value=s.completed;
+      renderAssets(s.assets||[]);
+      $('generateStatus').textContent=s.current?.phase==='asset'?`מייצר נכס רציפות: ${s.current.asset}`:`נוצרו ${s.completed} מתוך ${s.total}`;
+      if(s.images.length!==shownImages){
+        shownImages=s.images.length;
+        renderWebtoon(s.images);
+      }
+      if(s.status==='completed'||s.status==='failed'){
+        clearInterval(pollTimer);
+        $('generate').disabled=false;
+        $('generateStatus').textContent=s.status==='completed'?'הסתיים בהצלחה — כל הפאנלים זמינים!':'שגיאה: '+s.error;
+        setExports();
+        await loadProjects();
+        loadGlobalAssets();
+      }
+    },700);
+  }catch(e){
+    $('generateStatus').textContent=e.message;
+    $('generate').disabled=false;
+  }
+};
+
+$('loadProject').onclick=async()=>{
+  const id=$('projects').value;
+  if(!id) return;
+  const d=await (await fetch('/api/projects/'+id)).json();
+  currentProject=id;
+  renderPlan(d.plan);
+  renderAssets(d.plan.assets||[]);
+  renderWebtoon(d.images||[]);
+  shownImages=(d.images||[]).length;
+  setExports();
+  document.querySelector('[data-tab="generation"]').click();
+};
+
+$('saveProject').onclick=async()=>{
+  if(!currentProject||!currentPlan) return alert('אין פרויקט לשמירה');
+  const r=await fetch('/api/projects/'+currentProject+'/save',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(currentPlan)
+  });
+  alert(r.ok?'נשמר בהצלחה!':'שגיאה בשמירה');
+  await loadProjects();
+};
+
+$('refreshAssets').onclick=()=>loadGlobalAssets();
+
+async function init(){
+  await loadWorkflows();
+  await loadProjects();
+  await loadGlobalAssets();
+}
+init();
+</script>
+</body></html>

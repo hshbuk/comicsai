@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+outputs/*
+!outputs/.gitkeep
+*.log
+_pasted_ui.txt
+_request.txt

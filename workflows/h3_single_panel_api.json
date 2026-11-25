@@ -1,0 +1,47 @@
+{
+  "1": {
+    "class_type": "MiniMaxH3Loader",
+    "inputs": {
+      "model_name": "minimax_h3_image.gguf"
+    },
+    "_meta": {
+      "title": "Load MiniMax H3 Model"
+    }
+  },
+  "2": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "__REFERENCE_IMAGE__"
+    },
+    "_meta": {
+      "title": "Character / Asset Reference"
+    }
+  },
+  "3": {
+    "class_type": "MiniMaxH3ReferenceSampler",
+    "inputs": {
+      "model": ["1", 0],
+      "reference_image": ["2", 0],
+      "prompt": "__PROMPT__",
+      "negative_prompt": "__NEGATIVE_PROMPT__",
+      "seed": "__SEED__",
+      "steps": 20,
+      "guidance_scale": 5.0,
+      "width": 832,
+      "height": 1216
+    },
+    "_meta": {
+      "title": "H3 Webtoon Panel Generator"
+    }
+  },
+  "4": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "comics_ai/h3_panel",
+      "images": ["3", 0]
+    },
+    "_meta": {
+      "title": "Save Comic Panel"
+    }
+  }
+}
