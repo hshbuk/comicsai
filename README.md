@@ -22,16 +22,16 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 לאחר ההפעלה פתחו בדפדפן: `http://127.0.0.1:8000` (או השתמשו ב-[`ComicsAI.bat`](ComicsAI.bat) לניהול אינטראקטיבי, הגדרת שרתי LLM/ComfyUI מרוחקים והצגת כתובת הרשת הביתית ל-Tachiyomi).
 
-## תיעוד מלא (Wiki)
+## תיעוד מלא (GitHub Wiki)
 
-התיעוד המלא והמפורט נמצא בתיקיית [`wiki/`](wiki/Home.md) (ובלשונית ה-Wiki ב-GitHub):
+כל התיעוד המפורט נמצא בלשונית ה-**Wiki** של הפרויקט:
 
-- [דף הבית](wiki/Home.md)
-- [ארכיטקטורה וזרימת עבודה](wiki/Architecture.md)
-- [התקנה, `.env` ולוח הבקרה](wiki/Installation-and-Configuration.md)
-- [Workflows של ComfyUI](wiki/ComfyUI-Workflows.md)
-- [חיבור ל-Tachiyomi / Aniyomi / OPDS](wiki/Reader-Server-Tachiyomi-OPDS.md)
-- [תיעוד API מלא](wiki/API-Reference.md)
+- [דף הבית של ה-Wiki](https://github.com/hshbuk/comicsai/wiki)
+- [ארכיטקטורה וזרימת עבודה](https://github.com/hshbuk/comicsai/wiki/Architecture)
+- [התקנה, `.env` ולוח הבקרה](https://github.com/hshbuk/comicsai/wiki/Installation-and-Configuration)
+- [Workflows של ComfyUI](https://github.com/hshbuk/comicsai/wiki/ComfyUI-Workflows)
+- [חיבור ל-Tachiyomi / Aniyomi / OPDS](https://github.com/hshbuk/comicsai/wiki/Reader-Server-Tachiyomi-OPDS)
+- [תיעוד API מלא](https://github.com/hshbuk/comicsai/wiki/API-Reference)
 
 ## בדיקות
 
