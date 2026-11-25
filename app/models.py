@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 class PlanRequest(BaseModel):
     brief: str = Field(min_length=1, max_length=12000)
-    pages: int = Field(default=1, ge=1, le=100)
+    pages: int = Field(default=1, ge=1)
     panels_per_page: int = Field(default=4, ge=1, le=16)
     style: str = Field(default="comic book illustration", max_length=500)
     color_mode: str = Field(default="color", pattern="^(color|bw)$")
